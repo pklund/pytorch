@@ -393,22 +393,35 @@ c10::SymBool TensorImpl::sym_is_non_overlapping_and_dense_custom() const {
 }
 
 IntArrayRef TensorImpl::sizes_custom() const {
-  // python faketensor path
+  // for faketensors with symints, a return type of IntArrayRef is problematic
+  // because in order to return a ref you need to have smth owning it and for SymInts
+  // this is not materialized yet
   if (C10_UNLIKELY(matches_python_custom(SizesStridesPolicy::CustomSizes))) {
     return (*c10::impl::getGlobalPyInterpreter())->sizes(this);
   }
   if (C10_UNLIKELY(has_symbolic_sizes_strides_)) {
-    // if tensor is not c++ faketensor and Fake has not been
+    // to detemrine if a tensor is Python FakeTensor
+    // we check if tensor is not c++ faketensor and Fake has not been
     // excluded from TLS
     // fakeFallback will exclude Fake key explicitly before dispatching
     // to meta kernel
     // also not excluded != included since its different bits or smth
+
+    // for Python FakeTensor, we use PyInterpreter to call .sizes() and guard the SymInts
+    // with the concrete integer value. this is stored on the PyObject which is tied to
+    // the lifetime of the tensor
     if (!is_fake() &&
         !c10::impl::tls_is_dispatch_key_excluded(DispatchKey::Fake)) {
       if (auto* interp = c10::impl::getGlobalPyInterpreter()) {
         return (*interp)->sizes(this);
       }
     }
+    // for C++ FakeTensors that haven't crossed the Python boundary, we don't
+    // have a PyInterpreter yet
+    // so we call guard_int() directly here to materialize the vector
+    // and we store this on the SymbolicShapeMeta in the tensor's TensorImpl
+    // so the lifetime is also equivalently tied to the lifetime of the tensor
+    // and is owned by SymbolicShapeMeta
     auto& sym = symbolic_shape_meta();
     if (!sym.sizes_materialized_) {
       sym.materialized_sizes_.resize(sym.sizes_.size());
