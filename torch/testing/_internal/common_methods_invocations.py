@@ -7158,7 +7158,6 @@ def skips_mvlgamma(skip_redundant=False):
         # Redundant tests
         skips = skips + (  # type: ignore[assignment]
             DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients'),
-            DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients'),
             DecorateInfo(unittest.skip("Skipped!"), 'TestJit'),
             DecorateInfo(unittest.skip("Skipped!"), 'TestCommon'),
         )
@@ -12393,10 +12392,6 @@ op_db: list[OpInfo] = [
                    dtypesIfHpu=custom_types(torch.float32, torch.bfloat16),
                    sample_inputs_func=sample_inputs_abs,
                    skips=(
-                       DecorateInfo(unittest.skip("In-place abs not supported for complex tensors"), 'TestBwdGradients',
-                                    'test_inplace_grad', dtypes=(torch.cdouble,)),
-                       DecorateInfo(unittest.skip("In-place abs not supported for complex tensors"), 'TestBwdGradients',
-                                    'test_inplace_gradgrad', dtypes=(torch.cdouble,)),
                        DecorateInfo(unittest.skip("In-place abs not supported for complex tensors"), 'TestFwdGradients',
                                     'test_inplace_forward_mode_AD', dtypes=(torch.cdouble,)),
                        DecorateInfo(unittest.skip("In-place abs not supported for complex tensors"), "TestSparseUnaryUfuncs",
@@ -12476,12 +12471,6 @@ op_db: list[OpInfo] = [
                        DecorateInfo(unittest.skip("Skipped!"), 'TestUnaryUfuncs', 'test_reference_numerics_large',
                                     device_type='cuda', dtypes=[torch.cdouble],
                                     active_if=IS_WINDOWS),
-                       DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad',
-                                    dtypes=[torch.cdouble], active_if=IS_WINDOWS),
-                       DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_method_grad',
-                                    dtypes=[torch.cdouble], active_if=IS_WINDOWS),
-                       DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_inplace_grad',
-                                    dtypes=[torch.cdouble], active_if=IS_WINDOWS),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD',
                                     dtypes=[torch.cdouble], active_if=IS_WINDOWS),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_inplace_forward_mode_AD',
@@ -13874,9 +13863,7 @@ op_db: list[OpInfo] = [
                    'test_schema_correctness',
                    dtypes=(torch.complex64, torch.complex128)),
                # Float did not match double
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_grad'),
                # Jacobian mismatch
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_gradgrad'),
                DecorateInfo(unittest.expectedFailure, 'TestFwdGradients', 'test_forward_mode_AD'),
                DecorateInfo(unittest.skip("Barely fails"), 'TestFwdGradients', 'test_fn_fwgrad_bwgrad'),
                # JIT test not working for tensor kwargs (https://github.com/pytorch/pytorch/issues/58507)
@@ -14336,7 +14323,6 @@ op_db: list[OpInfo] = [
                skipCPUIfNoFFT,
                # gradcheck fails on ROCm (gh-68429)
                # grad is computed improperly (probably for weights tensor)
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_grad'),
                # Pre-existing condition (calls .item); needs to be fixed
             ),
            ),
@@ -14415,10 +14401,8 @@ op_db: list[OpInfo] = [
                # RuntimeError: Sparse CSR tensors do not have strides
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_fn_fwgrad_bwgrad'),
                # ValueError: Sparse output is not supported at gradcheck yet. Please call to_dense(masked_grad=...) ...
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad'),
                # RuntimeError: sparse_mask does not support automatic differentiation for outputs with complex dtype.
                # RuntimeError: Sparse CSR tensors do not have is_contiguous
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_gradgrad'),
                # ValueError: Sparse output is not supported at gradcheck yet. Please call to_dense(masked_grad=...) ...
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD'),
                # NotImplementedError: Could not run 'aten::sparse_sampled_addmm' with arguments from the 'SparseCsrMeta' backend.
@@ -14457,13 +14441,10 @@ op_db: list[OpInfo] = [
                # ValueError: Sparse output is not supported at gradcheck yet. Please call to_dense(masked_grad=...) ...
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_fn_fwgrad_bwgrad'),
                # RuntimeError: Sparse CSR tensors do not have is_contiguou
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad'),
                # ValueError: Sparse output is not supported at gradcheck yet. Please call to_dense(masked_grad=...) ...
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_gradgrad'),
                # RuntimeError: Sparse CSR tensors do not have strides
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD'),
                # ValueError: Sparse output is not supported at gradcheck yet. Please call to_dense(masked_grad=...) ...
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_fail_gradgrad'),
                # NotImplementedError: Could not run 'aten::_sparse_mm_reduce_impl' with arguments from the 'SparseCsrMeta' backend
                DecorateInfo(unittest.skip("Skipped!"), 'TestMeta', 'test_dispatch_meta_outplace'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestMeta', 'test_dispatch_symbolic_meta_outplace'),
@@ -15752,8 +15733,7 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.skip("Errors when storage_offset is included"), 'TestMathBits', 'test_conj_view'),
                DecorateInfo(unittest.skip("Errors when storage_offset is included"), 'TestMathBits', 'test_neg_view'),
                DecorateInfo(unittest.skip("Numerous errors"), 'TestFwdGradients'),
-               DecorateInfo(unittest.skip("Numerous errors"), 'TestBwdGradients'),
-           )),
+               )),
     OpInfo('as_strided',
            variant_test_name='partial_views',
            dtypes=all_types_and_complex_and(torch.bool, torch.float16, torch.bfloat16, torch.chalf),
@@ -15776,8 +15756,6 @@ op_db: list[OpInfo] = [
                             dtypes=(torch.complex64, torch.complex128)),
                DecorateInfo(unittest.expectedFailure, 'TestFwdGradients', 'test_forward_mode_AD'),
                DecorateInfo(unittest.expectedFailure, 'TestFwdGradients', 'test_inplace_forward_mode_AD'),
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_inplace_grad'),
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_inplace_gradgrad'),
                DecorateInfo(unittest.expectedFailure, 'TestProxyTensorOpInfo',
                             'test_make_fx_symbolic_exhaustive_inplace'),
                DecorateInfo(unittest.expectedFailure, 'TestNNCOpInfo', 'test_nnc_correctness'),
@@ -15813,7 +15791,6 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.skip("Errors when storage_offset is included"), 'TestMathBits', 'test_conj_view'),
                DecorateInfo(unittest.skip("Errors when storage_offset is included"), 'TestMathBits', 'test_neg_view'),
                DecorateInfo(unittest.skip("Numerous errors"), 'TestFwdGradients'),
-               DecorateInfo(unittest.skip("Numerous errors"), 'TestBwdGradients'),
                DecorateInfo(unittest.expectedFailure, 'TestDTensorOps', 'test_dtensor_op_db'),
            )),
     OpInfo('as_strided_scatter',
@@ -15830,7 +15807,6 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.skip('Fails in most cases, passes on LAZY for some reason'), 'TestCommon', 'test_variant_consistency_eager'),
                DecorateInfo(unittest.skip('Fails on cuda'), 'TestCommon', 'test_complex_half_reference_testing',
                             active_if=not TEST_WITH_ROCM),
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_grad'),
                DecorateInfo(unittest.expectedFailure, 'TestFwdGradients', 'test_forward_mode_AD'),
                DecorateInfo(unittest.skip('Passes on complex128 and float64 only'), 'TestFwdGradients', 'test_fn_fwgrad_bwgrad'),
                # AssertionError: Tensor-likes are not close! (new_empty_strided.default)
@@ -15850,7 +15826,6 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.skip('Skipped!'), 'TestFwdGradients', 'test_forward_mode_AD'),
                # Tests fail when weight=None and bias is defined
                # https://github.com/pytorch/pytorch/issues/79705
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_gradgrad'),
                # JIT test also tries to compute double backward, which fails
                DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
                DecorateInfo(unittest.skip("Unsupported on MPS for now"), 'TestCommon', 'test_numpy_ref_mps'),
@@ -17234,8 +17209,6 @@ op_db: list[OpInfo] = [
                # and if there are several indices pointing to the same memory,
                # gradcheck is oblivious about that and cannot perturb them all at once
                # (see sample_inputs_max_unpool_grad to find out more).
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad'),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_gradgrad'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD',
                             active_if=(not IS_MACOS)),
                DecorateInfo(unittest.skip("Skipped!"), 'TestCompositeCompliance', 'test_forward_ad',
@@ -17277,8 +17250,6 @@ op_db: list[OpInfo] = [
                # (see sample_inputs_max_unpool_grad to find out more).
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD',
                             active_if=(not IS_MACOS)),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_gradgrad'),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestDecomp', 'test_quick_core_backward'),
            )),
     OpInfo('nn.functional.max_unpool2d',
@@ -17320,8 +17291,6 @@ op_db: list[OpInfo] = [
                # (see sample_inputs_max_unpool_grad to find out more).
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients', 'test_forward_mode_AD',
                             active_if=(not IS_MACOS)),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_gradgrad'),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients', 'test_fn_grad'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestDecomp', 'test_quick_core_backward'),
            )),
     OpInfo('nn.functional.max_unpool3d',
@@ -17811,7 +17780,7 @@ op_db: list[OpInfo] = [
                 toleranceOverride({torch.float16: tol(atol=1e-04, rtol=0.001)}), 'TestUnaryUfuncs', device_type='cuda',), ],
         skips=[
             # still want to test that first derivative works though second derivative isn't supported
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', "test_inplace_gradgrad")]
+            ]
     ),
     UnaryUfuncInfo(
         'nn.functional.logsigmoid',
@@ -18664,7 +18633,6 @@ op_db: list[OpInfo] = [
                        # test_ops already tested for this overload with `decimals_0` opinfo entry
                        DecorateInfo(unittest.skip("Skipped!"), 'TestCommon'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients'),
-                       DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestJit'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestMathBits'),
                        DecorateInfo(toleranceOverride({torch.bfloat16: tol(atol=1e-3, rtol=0.016)}),
@@ -18690,7 +18658,6 @@ op_db: list[OpInfo] = [
                        # test_ops already tested for this overload with `decimals_0` opinfo entry
                        DecorateInfo(unittest.skip("Skipped!"), 'TestCommon'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients'),
-                       DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestJit'),
                        DecorateInfo(unittest.skip("Skipped!"), 'TestMathBits'),
                    ),
@@ -19009,8 +18976,7 @@ op_db: list[OpInfo] = [
                         DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit',),
                         # TODO: FIXME tolerance is too high
                         DecorateInfo(unittest.skip('Skipped!'), 'TestFwdGradients'),
-                        DecorateInfo(unittest.skip('Skipped!'), 'TestBwdGradients'),
-                    ),
+                        ),
                     assert_autodiffed=True,
                     autodiff_nonfusible_nodes=['aten::pow'],),
     BinaryUfuncInfo('__rsub__',
@@ -19677,7 +19643,6 @@ op_db: list[OpInfo] = [
                      skips=(
                          # Redundant tests
                          DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients'),
-                         DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients'),
                          DecorateInfo(unittest.skip("Skipped!"), 'TestJit'),
                          DecorateInfo(unittest.skip("Skipped!"), 'TestNormalizeOperators'),
                          DecorateInfo(unittest.skip("Skipped!"), 'TestCommon'),
@@ -20066,7 +20031,6 @@ op_db: list[OpInfo] = [
         skips=(
             # autograd tests don't handle operators that change dtype
             DecorateInfo(unittest.expectedFailure, 'TestFwdGradients'),
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients'),
             DecorateInfo(unittest.expectedFailure, "TestNormalizeOperators", "test_normalize_operator_exhaustive"),
             # RuntimeError: attribute lookup is not defined on builtin
             DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
@@ -20136,7 +20100,6 @@ op_db: list[OpInfo] = [
         skips=(
             # autograd tests don't handle operators that change dtype
             DecorateInfo(unittest.expectedFailure, 'TestFwdGradients'),
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients'),
             DecorateInfo(unittest.expectedFailure, "TestNormalizeOperators", "test_normalize_operator_exhaustive"),
             # RuntimeError: attribute lookup is not defined on builtin
             DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
@@ -20151,7 +20114,6 @@ op_db: list[OpInfo] = [
         skips=(
             # autograd tests don't handle operators that change dtype
             DecorateInfo(unittest.expectedFailure, 'TestFwdGradients'),
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients'),
             DecorateInfo(unittest.expectedFailure, "TestNormalizeOperators", "test_normalize_operator_exhaustive"),
             # RuntimeError: attribute lookup is not defined on builtin
             DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
@@ -20220,7 +20182,6 @@ op_db: list[OpInfo] = [
         skips=(
             # autograd tests don't handle operators that change dtype
             DecorateInfo(unittest.expectedFailure, 'TestFwdGradients'),
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients'),
             DecorateInfo(unittest.expectedFailure, "TestNormalizeOperators", "test_normalize_operator_exhaustive"),
             # RuntimeError: attribute lookup is not defined on builtin
             DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
@@ -20235,7 +20196,6 @@ op_db: list[OpInfo] = [
         skips=(
             # autograd tests don't handle operators that change dtype
             DecorateInfo(unittest.expectedFailure, 'TestFwdGradients'),
-            DecorateInfo(unittest.expectedFailure, 'TestBwdGradients'),
             # use of lambda doesn't work with test_normalize_operator_exhaustive
             DecorateInfo(unittest.expectedFailure, 'TestNormalizeOperators', 'test_normalize_operator_exhaustive'),
             # RuntimeError: "sum_cpu" not implemented for 'ComplexHalf'
@@ -20772,7 +20732,6 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.expectedFailure, 'TestCommon', 'test_out_warning'),
                # Computed gradient is incorrect -- would be an exfail but gradgrad somehow passes
                DecorateInfo(unittest.skip("Gradients are incorrect!"), 'TestFwdGradients'),
-               DecorateInfo(unittest.skip("Gradients are incorrect!"), 'TestBwdGradients'),
                DecorateInfo(unittest.skip('output is non-deterministic'), 'TestCommon', 'test_compare_cpu'),
                # RuntimeError: Difference from {dtype} is larger with decomposition
                DecorateInfo(unittest.skip("Skipped!"), 'TestDecomp', 'test_comprehensive'),
@@ -20801,7 +20760,6 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.skip("Skipped!"), 'TestCommon', 'test_out_warning'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestMathBits', 'test_neg_view'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestFwdGradients'),
-               DecorateInfo(unittest.skip("Skipped!"), 'TestBwdGradients'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestCommon', 'test_compare_cpu'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestEagerFusionOpInfo'),
                DecorateInfo(unittest.skip("Skipped!"), 'TestOperators'),
@@ -20996,8 +20954,7 @@ op_db: list[OpInfo] = [
                DecorateInfo(unittest.expectedFailure, 'TestNNCOpInfo', 'test_nnc_correctness'),
                # see https://github.com/pytorch/pytorch/issues/99806
                # RuntimeError: The size of tensor a (25) must match the size of tensor b (0) at non-singleton dimension 0.
-               DecorateInfo(unittest.expectedFailure, 'TestBwdGradients', 'test_fn_gradgrad'),
-           )),
+               )),
     OpInfo('unbind',
            dtypes=all_types_and_complex_and(torch.complex32, torch.bool, torch.float16, torch.bfloat16),
            ref=reference_unbind,
@@ -22975,12 +22932,6 @@ op_db: list[OpInfo] = [
         gradcheck_wrapper=gradcheck_wrapper_ctc_loss,
         skips=(
             # RuntimeError: derivative for aten::_ctc_loss_backward is not implemented
-            DecorateInfo(
-                unittest.expectedFailure,
-                "TestBwdGradients",
-                "test_fn_gradgrad",
-                dtypes=(torch.float64,),
-            ),
             # RuntimeError: derivative for aten::_ctc_loss_backward is not implemented
             DecorateInfo(
                 unittest.skip("Skipped!"),
